@@ -10,10 +10,10 @@ utilisé par les applications front du pass culture.
 Tant que les tests fonctionnels ne sont pas écrits, cette lib ne peut être considérée en production.
 
 ## Basic Usage
-
-Let's say you have component at location '/foo?counter=1'
-
 ```javascript
+
+// Let's say you have component at location '/foo?counter=1'
+
 import withQueryRouter from 'with-query-router'
 
 class FooPage extends Component {
