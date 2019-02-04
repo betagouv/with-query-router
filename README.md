@@ -1,9 +1,5 @@
 # with-query-router
 
-This is a small wrapper of react-router. It passes helpers in the props in order to:
-  - have easy access to the query params from the location.search.
-  - navigate from successive search queries.
-
 ** EN CONSTRUCTION **
 Ce code est du code externalisé du https://github.com/betagouv/pass-culture-shared qui concentre un nombre d'utilités React Redux
 utilisé par les applications front du pass culture.
@@ -39,5 +35,5 @@ class FooPage extends Component {
   }
 }
 
-export default withQueryRouter(MyQueryPage)
+export default withQueryRouter(FooPage)
 ```
