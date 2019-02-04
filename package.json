@@ -6,7 +6,6 @@
     "prop-types": "^15.6.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.0"
   },
@@ -42,17 +41,13 @@
     "prettier-stylelint": "^0.4.2",
     "pretty-quick": "^1.6.0",
     "react-addons-test-utils": "^15.6.2",
-    "react-test-renderer": "^16.5.1",
-    "stylelint": "^9.4.0",
-    "stylelint-config-standard": "^18.2.0",
-    "stylelint-order": "^0.8.1",
-    "stylelint-scss": "^3.2.0"
+    "react-test-renderer": "^16.5.1"
   },
   "keywords": [
-    "redux",
     "react",
-    "modal",
-    "modals"
+    "react-router",
+    "hoc",
+    "query"
   ],
   "main": "lib/index.js",
   "name": "with-query-router",
@@ -66,5 +61,5 @@
     "watch": "nodemon --watch src --exec \"npm run compile\"",
     "test:unit": "yarn jest --env=jsdom ./src"
   },
-  "version": "0.0.1"
+  "version": "0.0.2"
 }
