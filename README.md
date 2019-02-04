@@ -12,7 +12,7 @@ Tant que les tests fonctionnels ne sont pas écrits, cette lib ne peut être con
 ## Basic Usage
 ```javascript
 
-// Let's say you have component at location '/foo?counter=1'
+// Let's say you are at location '/foo?counter=1'
 
 import withQueryRouter from 'with-query-router'
 
