@@ -4,7 +4,7 @@ import { stringify } from 'query-string'
 import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router-dom'
 
-import selectQueryParamsFromQueryString from './selectQueryParamsFromQueryString'
+import { selectQueryParamsFromQueryString } from './selectQueryParamsFromQueryString'
 
 export const withQueryRouter = WrappedComponent => {
   class _withQueryRouter extends PureComponent {
