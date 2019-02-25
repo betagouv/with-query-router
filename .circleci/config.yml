@@ -7,11 +7,14 @@ jobs:
     working_directory: ~/
     steps:
       - run:
+          name: Install
+          command: |
+            ./install_ci.sh
+            yarn install
+      - run:
           name: Running Unit Tests
           command: |
-            yarn install
             yarn test:unit
-
 workflows:
   version: 2
   commit:
