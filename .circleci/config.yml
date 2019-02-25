@@ -1,0 +1,19 @@
+version: 2.0
+
+jobs:
+  build:
+    machine:
+      image: circleci/classic:latest
+    working_directory: ~/
+    steps:
+      - run:
+          name: Running Unit Tests
+          command: |
+            yarn install
+            yarn test:unit
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
