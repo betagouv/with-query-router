@@ -65,5 +65,5 @@
     "watch": "nodemon --watch src --exec \"npm run compile\"",
     "test:unit": "$(yarn bin)/jest --env=jsdom ./src"
   },
-  "version": "0.0.7"
+  "version": "0.1.0"
 }
