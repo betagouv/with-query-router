@@ -1,9 +1,6 @@
 # with-query-router
 
-** EN CONSTRUCTION **
-Ce code est du code externalisé du https://github.com/betagouv/pass-culture-shared qui concentre un nombre d'utilités React Redux
-utilisé par les applications front du pass culture.
-Tant que les tests fonctionnels ne sont pas écrits, cette lib ne peut être considérée en production.
+A small wrapper of react-router parsing the query params from the location.search
 
 ## Basic Usage
 ```javascript
@@ -14,7 +11,7 @@ import withQueryRouter from 'with-query-router'
 
 class FooPage extends Component {
 
-  onIncrementCounterClick = () => {
+  onIncrementCounter = () => {
     const { query } = this.props
     const { counter } = query.parse()
     // navigate to /foo?counter=2
@@ -27,7 +24,7 @@ class FooPage extends Component {
     return (
       <div>
         My counter is equal to {counter}
-        <button onClick={this.onIncrementCounterClick}>
+        <button onClick={this.onIncrementCounter}>
           Increment
         </button>
       </div>
