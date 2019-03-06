@@ -24,7 +24,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
       it('withQueryRouter passes a query.parse function that formats the location search string into in a params object', () => {
         // given
         const history = createBrowserHistory()
-        history.push('/test?page=1&mots-cles=test')
+        history.push('/test?page=1&mots-cles=test&orderBy=offer.id+desc')
 
         // when
         const wrapper = mount(
@@ -37,7 +37,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
         // then
         const { query } = wrapper.find('Test').props()
-        const expectedParams = { 'mots-cles': 'test', page: '1' }
+        const expectedParams = { 'mots-cles': 'test', page: '1', 'orderBy': 'offer.id desc' }
         expect(query.parse()).toEqual(expectedParams)
       }))
 
