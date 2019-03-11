@@ -2,6 +2,9 @@
 
 A small wrapper of react-router parsing the query params from the location.search
 
+[![CircleCI](https://circleci.com/gh/betagouv/with-query-router/tree/master.svg?style=svg)](https://circleci.com/gh/betagouv/with-query-router/tree/master)
+[![npm version](https://img.shields.io/npm/v/with-query-router.svg?style=flat-square)](https://npmjs.org/package/with-query-router)
+
 ## Basic Usage
 ```javascript
 

@@ -53,9 +53,14 @@
     "hoc",
     "query"
   ],
+  "license": "MIT",
   "main": "lib/index.js",
   "name": "with-query-router",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/betagouv/with-query-router"
+  },
   "scripts": {
     "compile": "rm -rf lib && babel --plugins transform-class-properties,transform-object-rest-spread --presets env,react -d lib/ src/",
     "postinstall": "if [ -d \"src/\" ]; then npm run compile; fi",
@@ -65,5 +70,5 @@
     "test": "$(yarn bin)/jest --env=jsdom ./src",
     "watch": "nodemon --watch src --exec \"npm run compile\""
   },
-  "version": "0.1.1"
+  "version": "1.0.0"
 }
