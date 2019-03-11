@@ -37,7 +37,11 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
         // then
         const { query } = wrapper.find('Test').props()
-        const expectedParams = { 'keywords': 'test', page: '1', 'orderBy': 'offer.id desc' }
+        const expectedParams = {
+          keywords: 'test',
+          orderBy: 'offer.id desc',
+          page: '1', 
+        }
         expect(query.parse()).toEqual(expectedParams)
       }))
 

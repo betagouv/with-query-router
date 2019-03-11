@@ -1,7 +1,7 @@
-import selectQueryParamsFromQueryString from '../selectQueryParamsFromQueryString'
+import { selectQueryParamsFromQueryString } from '../selectQueryParamsFromQueryString'
 
 describe('selectQueryParamsFromQueryString', () => {
-  it('', () => {
+  it('it parses a query string with memoized buffer', () => {
     // given
     const searchParams = '/test?page=1&keywords=test&orderBy=offer.id+desc'
 
