@@ -1,3 +1,4 @@
+import invert from 'lodash.invert'
 import uniq from 'lodash.uniq'
 import PropTypes from 'prop-types'
 import { stringify } from 'query-string'
@@ -11,6 +12,11 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
   const { mapper, translater } = config
   const editKey = config.editKey || 'edit'
   const newKey = config.newKey || 'new'
+
+  let invertedMapper
+  if (mapper) {
+    invertedMapper = invert(mapper)
+  }
 
   class _withQueryRouter extends PureComponent {
     constructor(props) {
@@ -51,15 +57,25 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       history.push(location.pathname)
     }
 
-    change = (queryParamsUpdater, changeConfig = {}) => {
+    change = (notTranslatedQueryParamsUpdater, changeConfig = {}) => {
       const { history, location } = this.props
       const queryParams = this.parse()
 
       const historyMethod = changeConfig.historyMethod || 'push'
       const pathname = changeConfig.pathname || location.pathname
-      const queryParamsKeys = uniq(
-        Object.keys(queryParams).concat(Object.keys(queryParamsUpdater))
-      )
+
+      let queryParamsUpdater = notTranslatedQueryParamsUpdater
+      if (translater) {
+        queryParamsUpdater = translater(queryParamsUpdater)
+      } else if (mapper) {
+        queryParamsUpdater = getObjectWithMappedKeys(
+          queryParamsUpdater, invertedMapper)
+      }
+
+      const queryParamsUpdaterKeys = Object.keys(queryParamsUpdater)
+      const concatenatedQueryParamKeys = Object.keys(queryParams)
+                                               .concat(queryParamsUpdaterKeys)
+      const queryParamsKeys = uniq(concatenatedQueryParamKeys)
 
       const nextQueryParams = {}
       queryParamsKeys.forEach(queryParamsKey => {

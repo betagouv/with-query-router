@@ -2,6 +2,7 @@
   "dependencies": {
     "classnames": "2.2.5",
     "eslint": "^5.8.0",
+    "lodash.invert": "^4.3.0",
     "lodash.uniq": "^4.5.0",
     "prop-types": "^15.6.2",
     "query-string": "^5.1.1",
@@ -70,5 +71,5 @@
     "test": "$(yarn bin)/jest --env=jsdom ./src",
     "watch": "nodemon --watch src --exec \"npm run compile\""
   },
-  "version": "2.0.0"
+  "version": "2.1.0"
 }

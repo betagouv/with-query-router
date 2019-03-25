@@ -55,7 +55,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
     })
 
     describe('translate', () => {
-      it('withQueryRouter passes query.translate function that transforms queryParams into mapped params', () => {
+      it('withQueryRouter passes query.translate function that transforms queryParams into transltaed params thanks to a mapper', () => {
         // given
         const history = createBrowserHistory()
         history.push('/test?lieu=AE')
@@ -66,16 +66,35 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             </Route>
           </Router>
         )
-        const { query } = wrapper.find('Test').props()
+        let props = wrapper.find('Test').props()
 
         // when
-        const translatedQueryParams = query.translate()
+        let translatedQueryParams = props.query.translate()
 
         // then
-        const expectedTranslatedQueryParams = {
+        let expectedTranslatedQueryParams = {
           venue: "AE"
         }
         expect(translatedQueryParams).toEqual(expectedTranslatedQueryParams)
+
+        // given
+        props.query.change({ venue: "BF" })
+
+        // when
+        const queryParams = props.query.parse()
+        translatedQueryParams = props.query.translate()
+
+        // then
+        props = wrapper.find('Test').props()
+        const expectedQueryParams = {
+          lieu: "BF"
+        }
+        expectedTranslatedQueryParams = {
+          venue: "BF"
+        }
+        expect(queryParams).toEqual(expectedQueryParams)
+        expect(translatedQueryParams).toEqual(expectedTranslatedQueryParams)
+
       })
     })
 
