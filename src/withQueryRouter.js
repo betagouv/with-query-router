@@ -6,7 +6,10 @@ import { withRouter } from 'react-router-dom'
 
 import { selectQueryParamsFromQueryString } from './selectQueryParamsFromQueryString'
 
-export const withQueryRouter = WrappedComponent => {
+export const withQueryRouter = (config={}) => WrappedComponent => {
+  const editKey = config.editKey || 'edit'
+  const newKey = config.newKey || 'new'
+
   class _withQueryRouter extends PureComponent {
     constructor(props) {
       super(props)
@@ -30,6 +33,7 @@ export const withQueryRouter = WrappedComponent => {
         args.sort()
         nextValue = args.join(',')
       } else if (typeof previousValue === 'undefined') {
+        /* eslint-disable no-console */
         console.warn(
           `Weird did you forget to mention this ${key} query param in your withQueryRouter hoc?`
         )
@@ -86,25 +90,32 @@ export const withQueryRouter = WrappedComponent => {
       const { location: { pathname, search } } = this.props
       const queryParams = this.parse()
 
-      if (pathname.endsWith('new')) {
+      const re = new RegExp(`(${newKey})$`)
+      const matchedResults = pathname.match(re)
+      const matchedKey = matchedResults && matchedResults[0]
+      if (matchedKey) {
+        const originLocationString = `${pathname.slice(0, -matchedKey.length)}${search}`
         return {
           isEditEntity: false,
           isNewEntity: true,
           method: 'POST',
-          originLocationString: `${pathname.slice(0, -3)}${search}`,
+          originLocationString,
           readOnly: false,
         }
       }
 
-      if (Object.keys(queryParams).includes('edit')) {
+      if (Object.keys(queryParams).includes(editKey)) {
         const nextSearch = Object.assign({}, queryParams)
-        delete nextSearch.edit
-        const nextSearchString = stringify(nextSearch)
+        delete nextSearch[editKey]
+        const nextSearchString = Object.keys(nextSearch).length
+          ? `?${stringify(nextSearch)}`
+          : ''
+        const originLocationString = `${pathname}${nextSearchString}`
         return {
           isEditEntity: true,
           isNewEntity: false,
           method: 'PATCH',
-          originLocationString: `${pathname}${nextSearchString}`,
+          originLocationString,
           readOnly: false,
         }
       }
@@ -118,30 +129,55 @@ export const withQueryRouter = WrappedComponent => {
     }
 
     contextWithEntityInSearch = (key, id) => {
+      const { location: { pathname } } = this.props
       const queryParams = this.parse()
-      const paramsValue = queryParams[key]
+      let paramKey = key
+      let paramValue = queryParams[paramKey]
 
-      if (paramsValue === 'new') {
+      if (paramValue === newKey || (newKey.test && newKey.test(paramValue))) {
+
+        const nextSearch = Object.assign({}, queryParams)
+        delete nextSearch[paramKey]
+        const nextSearchString = stringify(nextSearch)
+        const originLocationString = Object.keys(nextSearch).length
+          ? `${pathname}?${nextSearchString}`
+          : pathname
+
         return {
           isEditEntity: false,
           isNewEntity: true,
           key,
           method: 'POST',
-          // originLocationString: `${pathname.slice(0, -3)}${searchString}`,
+          originLocationString,
           readOnly: false,
         }
       }
 
-      if (paramsValue === `edit${id || ''}`) {
-        // const nextSearch = Object.assign({}, search)
-        // delete nextSearch.edit
-        // const nextSearchString = stringify(nextSearch)
+      if (!paramValue) {
+        paramKey = `${key}${id}`
+        paramValue = queryParams[paramKey]
+        if (!paramValue) {
+          paramKey = Object.keys(queryParams)
+                           .find(queryKey => queryKey.startsWith(key))
+          paramValue = queryParams[paramKey]
+        }
+      }
+
+      if (paramValue === editKey) {
+
+        const nextSearch = Object.assign({}, queryParams)
+        delete nextSearch[paramKey]
+        const nextSearchString = stringify(nextSearch)
+        const originLocationString = Object.keys(nextSearch).length
+          ? `${pathname}?${nextSearchString}`
+          : pathname
+
         return {
           isEditEntity: true,
           isNewEntity: false,
           key,
           method: 'PATCH',
-          // originLocationString: `${pathname}${nextSearchString}`,
+          originLocationString,
           readOnly: false,
         }
       }
