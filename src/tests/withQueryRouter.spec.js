@@ -9,7 +9,10 @@ const Test = () => null
 const QueryRouterTest = withQueryRouter()(Test)
 const FrenchQueryRouterTest = withQueryRouter({
   editKey: 'modifie',
-  newKey: /nouveau|nouvelle/
+  mapper: {
+    'lieu': "venue"
+  },
+  newKey: /nouveau|nouvelle/,
 })(Test)
 
 describe('src | components | pages | hocs | withQueryRouter', () => {
@@ -48,6 +51,31 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           page: '1',
         }
         expect(query.parse()).toEqual(expectedParams)
+      })
+    })
+
+    describe('translate', () => {
+      it('withQueryRouter passes query.translate function that transforms queryParams into mapped params', () => {
+        // given
+        const history = createBrowserHistory()
+        history.push('/test?lieu=AE')
+        const wrapper = mount(
+          <Router history={history}>
+            <Route path="/test">
+              <FrenchQueryRouterTest />
+            </Route>
+          </Router>
+        )
+        const { query } = wrapper.find('Test').props()
+
+        // when
+        const translatedQueryParams = query.translate()
+
+        // then
+        const expectedTranslatedQueryParams = {
+          venue: "AE"
+        }
+        expect(translatedQueryParams).toEqual(expectedTranslatedQueryParams)
       })
     })
 

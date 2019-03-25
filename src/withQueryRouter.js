@@ -5,8 +5,10 @@ import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router-dom'
 
 import { selectQueryParamsFromQueryString } from './selectQueryParamsFromQueryString'
+import { getObjectWithMappedKeys } from './getObjectWithMappedKeys'
 
 export const withQueryRouter = (config={}) => WrappedComponent => {
+  const { mapper, translater } = config
   const editKey = config.editKey || 'edit'
   const newKey = config.newKey || 'new'
 
@@ -20,6 +22,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         context: this.context,
         parse: this.parse,
         remove: this.remove,
+        translate: this.translate
       }
     }
 
@@ -214,6 +217,17 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
           `Weird did you forget to mention this ${key} query param in your withQueryRouter hoc?`
         )
       }
+    }
+
+    translate = () => {
+      const queryParams = this.parse()
+      if (translater) {
+        return translater(queryParams)
+      }
+      if (mapper) {
+        return getObjectWithMappedKeys(queryParams, mapper)
+      }
+      return queryParams
     }
 
     render() {
