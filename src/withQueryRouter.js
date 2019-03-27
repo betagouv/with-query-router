@@ -153,7 +153,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       let paramKey = key
       let paramValue = queryParams[paramKey]
 
-      if (paramValue === newKey || (newKey.test && newKey.test(paramValue))) {
+      if (!id && (paramValue === newKey || (newKey.test && newKey.test(paramValue)))) {
 
         const nextSearch = Object.assign({}, queryParams)
         delete nextSearch[paramKey]

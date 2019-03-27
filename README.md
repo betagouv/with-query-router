@@ -103,7 +103,7 @@ class FooPage extends Component {
               )}
             />
             {
-              isReadOnly
+              readOnly
               ? (
                 <button onClick={this.handleActivateForm} type="button">
                   Create or Edit
