@@ -120,12 +120,10 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       const matchedResults = pathname.match(re)
       const matchedKey = matchedResults && matchedResults[0]
       if (matchedKey) {
-        const originLocationString = `${pathname.slice(0, -matchedKey.length - 1)}${search}`
         return {
           isModifiedEntity: false,
           isCreatedEntity: true,
           method: 'POST',
-          originLocationString,
           readOnly: false,
         }
       }
@@ -136,12 +134,10 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         const nextSearchString = Object.keys(nextSearch).length
           ? `?${stringify(nextSearch)}`
           : ''
-        const originLocationString = `${pathname}${nextSearchString}`
         return {
           isModifiedEntity: true,
           isCreatedEntity: false,
           method: 'PATCH',
-          originLocationString,
           readOnly: false,
         }
       }
@@ -165,27 +161,27 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         const nextSearch = Object.assign({}, queryParams)
         delete nextSearch[paramKey]
         const nextSearchString = stringify(nextSearch)
-        const originLocationString = Object.keys(nextSearch).length
-          ? `${pathname}?${nextSearchString}`
-          : pathname
 
         return {
           isModifiedEntity: false,
           isCreatedEntity: true,
           key,
           method: 'POST',
-          originLocationString,
           readOnly: false,
         }
       }
 
+      let paramId = id
       if (!paramValue) {
         paramKey = `${key}${id}`
         paramValue = queryParams[paramKey]
         if (!paramValue) {
           paramKey = Object.keys(queryParams)
                            .find(queryKey => queryKey.startsWith(key))
-          paramValue = queryParams[paramKey]
+          if (paramKey) {
+            paramValue = queryParams[paramKey]
+            paramId = paramKey.slice(key.length)
+          }
         }
       }
 
@@ -194,16 +190,13 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         const nextSearch = Object.assign({}, queryParams)
         delete nextSearch[paramKey]
         const nextSearchString = stringify(nextSearch)
-        const originLocationString = Object.keys(nextSearch).length
-          ? `${pathname}?${nextSearchString}`
-          : pathname
 
         return {
           isCreatedEntity: false,
           isModifiedEntity: true,
           key,
+          id: paramId,
           method: 'PATCH',
-          originLocationString,
           readOnly: false,
         }
       }

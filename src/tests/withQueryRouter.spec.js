@@ -263,7 +263,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
               isCreatedEntity: true,
               isModifiedEntity: false,
               method: 'POST',
-              originLocationString: '/tests',
               readOnly: false
             }
             expect(context).toEqual(expectedContext)
@@ -299,7 +298,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
               isModifiedEntity: true,
               isCreatedEntity: false,
               method: 'PATCH',
-              originLocationString: '/tests/AE',
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/tests/AE')
@@ -379,7 +377,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
               isModifiedEntity: false,
               key: 'test',
               method: 'POST',
-              originLocationString: '/foo',
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/foo')
@@ -415,11 +412,11 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             const context = query.context('test', 'AE')
 
             const expectedContext = {
+              id: "AE",
               isModifiedEntity: true,
               isCreatedEntity: false,
               key: 'test',
               method: 'PATCH',
-              originLocationString: '/foo',
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/foo')
@@ -493,7 +490,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             isModifiedEntity: false,
             isCreatedEntity: true,
             method: 'POST',
-            originLocationString: '/beaujolais',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
@@ -511,7 +507,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             isModifiedEntity: true,
             isCreatedEntity: false,
             method: 'PATCH',
-            originLocationString: '/beaujolais/AE',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
@@ -555,7 +550,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             isCreatedEntity: true,
             key: 'beaujolais',
             method: 'POST',
-            originLocationString: '/foo',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
@@ -570,11 +564,11 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
           // then
           expectedContext = {
+            id: "AE",
             isCreatedEntity: false,
             isModifiedEntity: true,
             key: 'beaujolais',
             method: 'PATCH',
-            originLocationString: '/foo',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
