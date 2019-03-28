@@ -51,27 +51,28 @@ class FooPage extends Component {
     const { foo, query } = this.props
     const { id } = foo
     // creation with pathname context
-    history.push('new')
-    // edition with pathname context
-    query.change({ edit: null })
-    // creation|edition with search context
-    query.change({ foo: id
-      ? `edit${id}`
-      : 'new'
-    })
+    query.changeToCreationUrl()
+    // OR modification with pathname context
+    query.changeToModificationUrl()
+    // OR creation  with search context
+    query.changeToCreationUrl('foo')
+    // OR modification with search context
+    query.changeToModificationUrl('foo', id)
   }
 
   handleDeactivateForm = formResolver => () => {
-    const { history } = this.props
-    const { originLocationString } = query.context()
+    const { foo, history, query } = this.props
+    const { id } = foo
     formResolver()
-    history.push(originLocationString)
+    // read only with pathname context
+    query.changeToReadOnlyUrl()
+    // OR read only with search context
+    query.changeToReadOnlyUrl('foo', id)
   }
 
   onFormSubmit = formValues => {
     const { dispatch, foo, history, query } = this.props
     const { id } = (foo || {})
-    const { originLocationString } = query.context()
     const formSubmitPromise = new Promise(resolve => {
       dispatch(requestData({
         apiPath: `/foos/${id || ''}`,
@@ -106,7 +107,7 @@ class FooPage extends Component {
               readOnly
               ? (
                 <button onClick={this.handleActivateForm} type="button">
-                  Create or Edit
+                  Create or Modify
                 </button>
               )
               : (
