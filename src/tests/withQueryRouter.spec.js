@@ -3,17 +3,7 @@ import { createBrowserHistory } from 'history'
 import React from 'react'
 import { Route, Router } from 'react-router-dom'
 
-import { withQueryRouter } from '../withQueryRouter'
-
-const Test = () => null
-const QueryRouterTest = withQueryRouter()(Test)
-const FrenchQueryRouterTest = withQueryRouter({
-  editKey: 'modifie',
-  mapper: {
-    'lieu': "venue"
-  },
-  newKey: /nouveau|nouvelle/,
-})(Test)
+import { FrenchQueryRouterTest, QueryRouterTest } from './utils'
 
 describe('src | components | pages | hocs | withQueryRouter', () => {
   describe('snapshot', () => {
@@ -55,58 +45,67 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
     })
 
     describe('translate', () => {
-      it('withQueryRouter passes query.translate function that transforms queryParams into transltaed params thanks to a mapper', () => {
+      it('withQueryRouter passes query.translate function that transforms queryParams into transltaed params thanks to a mapper', done => {
         // given
         const history = createBrowserHistory()
         history.push('/test?lieu=AE')
         const wrapper = mount(
           <Router history={history}>
             <Route path="/test">
-              <FrenchQueryRouterTest />
+              <FrenchQueryRouterTest onUpdate={onUpdate} />
             </Route>
           </Router>
         )
         let props = wrapper.find('Test').props()
 
         // when
-        let translatedQueryParams = props.query.translate()
+        const translatedQueryParams = props.query.translate()
 
         // then
-        let expectedTranslatedQueryParams = {
+        const expectedTranslatedQueryParams = {
           venue: "AE"
         }
         expect(translatedQueryParams).toEqual(expectedTranslatedQueryParams)
 
-        // given
+        // when
         props.query.change({ venue: "BF" })
 
-        // when
-        const queryParams = props.query.parse()
-        translatedQueryParams = props.query.translate()
-
         // then
-        props = wrapper.find('Test').props()
-        const expectedQueryParams = {
-          lieu: "BF"
+        function onUpdate(props, prevProps) {
+          const { location, query } = props
+          const { pathname, search } = location
+          const queryParams = query.parse()
+          const translatedQueryParams = query.translate()
+
+          props = wrapper.find('Test').props()
+          const expectedQueryParams = {
+            lieu: "BF"
+          }
+          const expectedTranslatedQueryParams = {
+            venue: "BF"
+          }
+          expect(prevProps.location.pathname).toEqual('/test')
+          expect(prevProps.location.search).toEqual('?lieu=AE')
+          expect(pathname).toEqual('/test')
+          expect(search).toEqual('?lieu=BF')
+          expect(queryParams).toEqual(expectedQueryParams)
+          expect(translatedQueryParams).toEqual(expectedTranslatedQueryParams)
+
+          done()
         }
-        expectedTranslatedQueryParams = {
-          venue: "BF"
-        }
-        expect(queryParams).toEqual(expectedQueryParams)
-        expect(translatedQueryParams).toEqual(expectedTranslatedQueryParams)
 
       })
     })
 
     describe('clear', () => {
-      it('withQueryRouter passes query.clear function that erases the location.search string', () => {
+      it('withQueryRouter passes query.clear function that erases the location.search string', done => {
         // given
         const history = createBrowserHistory()
         history.push('/test?page=1&keywords=test')
         const wrapper = mount(
           <Router history={history}>
             <Route path="/test">
-              <QueryRouterTest />
+              <QueryRouterTest onUpdate={onUpdate}/>
             </Route>
           </Router>
         )
@@ -116,20 +115,31 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
         query.clear()
 
         // then
-        const expectedParams = {}
-        expect(query.parse()).toEqual(expectedParams)
+        function onUpdate(props, prevProps) {
+          const { location, query } = props
+          const { pathname, search } = location
+          const expectedParams = {}
+
+          expect(prevProps.location.pathname).toEqual('/test')
+          expect(prevProps.location.search).toEqual('?page=1&keywords=test')
+          expect(pathname).toEqual('/test')
+          expect(search).toEqual('')
+          expect(query.parse()).toEqual(expectedParams)
+
+          done()
+        }
       })
     })
 
     describe('change', () => {
-      it('withQueryRouter passes query.change that overwrites the location.search', () => {
+      it('withQueryRouter passes query.change that overwrites the location.search', done => {
         // given
         const history = createBrowserHistory()
         history.push('/test?page=1&keywords=test')
         const wrapper = mount(
           <Router history={history}>
             <Route path="/test">
-              <QueryRouterTest />
+              <QueryRouterTest onUpdate={onUpdate}/>
             </Route>
           </Router>
         )
@@ -139,20 +149,31 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
         query.change({ 'keywords': null, page: 2 })
 
         // then
-        const expectedParams = { page: '2' }
-        expect(query.parse()).toEqual(expectedParams)
+        function onUpdate(props, prevProps) {
+          const { location, query } = props
+          const { pathname, search } = location
+          const expectedParams = { page: '2' }
+
+          expect(prevProps.location.pathname).toEqual('/test')
+          expect(prevProps.location.search).toEqual('?page=1&keywords=test')
+          expect(pathname).toEqual('/test')
+          expect(search).toEqual('?page=2')
+          expect(query.parse()).toEqual(expectedParams)
+
+          done()
+        }
       })
     })
 
     describe('add', () => {
-      it('withQueryRouter passes query.add function that concatenates values in the location.search', () => {
+      it('withQueryRouter passes query.add function that concatenates values in the location.search', done => {
         // given
         const history = createBrowserHistory()
         history.push('/test?jours=0,1&keywords=test')
         const wrapper = mount(
           <Router history={history}>
             <Route path="/test">
-              <QueryRouterTest />
+              <QueryRouterTest onUpdate={onUpdate} />
             </Route>
           </Router>
         )
@@ -162,20 +183,31 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
         query.add('jours', '2')
 
         // then
-        const expectedParams = { jours: '0,1,2', 'keywords': 'test' }
-        expect(query.parse()).toEqual(expectedParams)
+        function onUpdate(props, prevProps) {
+          const { location, query } = props
+          const { pathname, search } = location
+
+          const expectedParams = { jours: '0,1,2', 'keywords': 'test' }
+          expect(prevProps.location.pathname).toEqual('/test')
+          expect(prevProps.location.search).toEqual('?jours=0,1&keywords=test')
+          expect(pathname).toEqual('/test')
+          expect(search).toEqual('?jours=0%2C1%2C2&keywords=test')
+          expect(query.parse()).toEqual(expectedParams)
+
+          done()
+        }
       })
     })
 
     describe('remove', () => {
-      it('withQueryRouter passes query.remove function that pops values from the location.search', () => {
+      it('withQueryRouter passes query.remove function that pops values from the location.search', done => {
         // given
         const history = createBrowserHistory()
         history.push('/test?jours=0,1&keywords=test')
         const wrapper = mount(
           <Router history={history}>
             <Route path="/test">
-              <QueryRouterTest />
+              <QueryRouterTest onUpdate={onUpdate} />
             </Route>
           </Router>
         )
@@ -185,176 +217,257 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
         query.remove('jours', '1')
 
         // then
-        const expectedParams = { jours: '0', 'keywords': 'test' }
-        expect(query.parse()).toEqual(expectedParams)
+        function onUpdate(props, prevProps) {
+          const { location, query } = props
+          const { pathname, search } = location
+          const expectedParams = { jours: '0', 'keywords': 'test' }
+
+          expect(prevProps.location.pathname).toEqual('/test')
+          expect(prevProps.location.search).toEqual('?jours=0,1&keywords=test')
+          expect(pathname).toEqual('/test')
+          expect(search).toEqual('?jours=0&keywords=test')
+          expect(query.parse()).toEqual(expectedParams)
+
+          done()
+        }
       })
     })
 
     describe('context', () => {
       describe('pathname context', () => {
-        it('withQueryRouter gives query.context for creating an entity giving info in the pathname', () => {
+        it('withQueryRouter gives query.changeToCreationUrl and query.context for creating an entity given info in the pathname', done => {
           // given
           const history = createBrowserHistory()
-          history.push('/tests/new')
+          history.push('/tests')
           const wrapper = mount(
             <Router history={history}>
               <Route path="/tests/:context">
-                <QueryRouterTest />
+                <QueryRouterTest onUpdate={onUpdate} />
               </Route>
             </Router>
           )
-          const { query } = wrapper.find('Test').props()
+          const { location, query } = wrapper.find('Test').props()
 
           // when
-          const context = query.context()
+          query.changeToCreationUrl()
 
           // then
-          const expectedContext = {
-            isEditEntity: false,
-            isNewEntity: true,
-            method: 'POST',
-            originLocationString: '/tests/',
-            readOnly: false
+          function onUpdate(props, prevProps) {
+            const { location, query } = props
+            const { pathname, search } = location
+            const context = query.context()
+
+            expect(pathname).toEqual('/tests/creation')
+            expect(prevProps.location.pathname).toEqual('/tests')
+            const expectedContext = {
+              isCreatedEntity: true,
+              isModifiedEntity: false,
+              method: 'POST',
+              originLocationString: '/tests',
+              readOnly: false
+            }
+            expect(context).toEqual(expectedContext)
+
+            done()
           }
-          expect(context).toEqual(expectedContext)
+
         })
 
-        it('withQueryRouter gives context for editing an entity giving info in the pathname', () => {
-          // given
-          const history = createBrowserHistory()
-          history.push('/tests/AE?edit')
-          const wrapper = mount(
-            <Router history={history}>
-              <Route path="/tests/:context">
-                <QueryRouterTest />
-              </Route>
-            </Router>
-          )
-          const { query } = wrapper.find('Test').props()
-
-          // when
-          const context = query.context()
-
-          // then
-          const expectedContext = {
-            isEditEntity: true,
-            isNewEntity: false,
-            method: 'PATCH',
-            originLocationString: '/tests/AE',
-            readOnly: false
-          }
-          expect(context).toEqual(expectedContext)
-        })
-
-        it('withQueryRouter gives context for read only an entity giving info in the pathname', () => {
+        it('withQueryRouter gives query.changeToModificationUrl and query.context for modifying an entity given info in the pathname', done => {
           // given
           const history = createBrowserHistory()
           history.push('/tests/AE')
           const wrapper = mount(
             <Router history={history}>
               <Route path="/tests/:context">
-                <QueryRouterTest />
+                <QueryRouterTest onUpdate={onUpdate}/>
               </Route>
             </Router>
           )
           const { query } = wrapper.find('Test').props()
 
           // when
-          const context = query.context()
+          query.changeToModificationUrl()
 
           // then
-          const expectedContext = {
-            isEditEntity: false,
-            isNewEntity: false,
-            method: null,
-            readOnly: true
+          function onUpdate(props, prevProps) {
+            const { location, query } = props
+            const { pathname, search } = location
+            const context = query.context()
+
+            const expectedContext = {
+              isModifiedEntity: true,
+              isCreatedEntity: false,
+              method: 'PATCH',
+              originLocationString: '/tests/AE',
+              readOnly: false
+            }
+            expect(prevProps.location.pathname).toEqual('/tests/AE')
+            expect(prevProps.location.search).toEqual('')
+            expect(pathname).toEqual('/tests/AE')
+            expect(search).toEqual('?modification')
+            expect(context).toEqual(expectedContext)
+
+            done()
           }
-          expect(context).toEqual(expectedContext)
+        })
+
+        it('withQueryRouter gives query.changeToReadOnlyUrl and query.context for reading only an entity given info in the pathname', done => {
+          // given
+          const history = createBrowserHistory()
+          history.push('/tests/AE?modification')
+          const wrapper = mount(
+            <Router history={history}>
+              <Route path="/tests/:context">
+                <QueryRouterTest onUpdate={onUpdate} />
+              </Route>
+            </Router>
+          )
+          const { query } = wrapper.find('Test').props()
+
+          // when
+          query.changeToReadOnlyUrl()
+
+          // then
+          function onUpdate(props, prevProps) {
+            const { location, query } = props
+            const { pathname, search } = location
+            const context = query.context()
+
+            const expectedContext = {
+              isCreatedEntity: false,
+              isModifiedEntity: false,
+              method: null,
+              readOnly: true
+            }
+            expect(prevProps.location.pathname).toEqual('/tests/AE')
+            expect(prevProps.location.search).toEqual('?modification')
+            expect(pathname).toEqual('/tests/AE')
+            expect(search).toEqual('')
+            expect(context).toEqual(expectedContext)
+
+            done()
+          }
         })
       })
 
       describe('search context', () => {
-        it('withQueryRouter gives context for creating an entity giving info in the search', () => {
-          // given
-          const history = createBrowserHistory()
-          history.push('/foo?test=new')
-          const wrapper = mount(
-            <Router history={history}>
-              <Route path="/foo">
-                <QueryRouterTest />
-              </Route>
-            </Router>
-          )
-          const { query } = wrapper.find('Test').props()
-
-          // when
-          const context = query.context('test')
-
-          // then
-          const expectedContext = {
-            isEditEntity: false,
-            isNewEntity: true,
-            key: 'test',
-            method: 'POST',
-            originLocationString: '/foo',
-            readOnly: false
-          }
-          expect(context).toEqual(expectedContext)
-        })
-
-        it('withQueryRouter gives context for editing an entity giving info in the search', () => {
-          // given
-          const history = createBrowserHistory()
-          history.push('/foo?testAE=edit')
-          const wrapper = mount(
-            <Router history={history}>
-              <Route path="/foo">
-                <QueryRouterTest />
-              </Route>
-            </Router>
-          )
-          const { query } = wrapper.find('Test').props()
-
-          // when
-          const context = query.context('test')
-
-          // then
-          const expectedContext = {
-            isEditEntity: true,
-            isNewEntity: false,
-            key: 'test',
-            method: 'PATCH',
-            originLocationString: '/foo',
-            readOnly: false
-          }
-          expect(context).toEqual(expectedContext)
-        })
-
-        it('withQueryRouter gives context for read only an entity giving info in the search', () => {
+        it('withQueryRouter gives query.changeToCreationUrl and query.context for creating an entity given info in the search', done => {
           // given
           const history = createBrowserHistory()
           history.push('/foo')
           const wrapper = mount(
             <Router history={history}>
               <Route path="/foo">
-                <QueryRouterTest />
+                <QueryRouterTest onUpdate={onUpdate} />
               </Route>
             </Router>
           )
           const { query } = wrapper.find('Test').props()
 
           // when
-          const context = query.context('test')
+          query.changeToCreationUrl('test')
 
           // then
-          const expectedContext = {
-            isEditEntity: false,
-            isNewEntity: false,
-            key: 'test',
-            method: null,
-            readOnly: true
+          function onUpdate(props, prevProps) {
+            const { location, query } = props
+            const { pathname, search } = location
+            const context = query.context('test')
+
+            const expectedContext = {
+              isCreatedEntity: true,
+              isModifiedEntity: false,
+              key: 'test',
+              method: 'POST',
+              originLocationString: '/foo',
+              readOnly: false
+            }
+            expect(prevProps.location.pathname).toEqual('/foo')
+            expect(prevProps.location.search).toEqual('')
+            expect(pathname).toEqual('/foo')
+            expect(search).toEqual('?test=creation')
+            expect(context).toEqual(expectedContext)
+
+            done()
           }
-          expect(context).toEqual(expectedContext)
+        })
+
+        it('withQueryRouter gives query.changeToModificationUrl and query.context for modifying an entity given info in the search', done => {
+          // given
+          const history = createBrowserHistory()
+          history.push('/foo')
+          const wrapper = mount(
+            <Router history={history}>
+              <Route path="/foo">
+                <QueryRouterTest onUpdate={onUpdate} />
+              </Route>
+            </Router>
+          )
+          const { query } = wrapper.find('Test').props()
+
+          // when
+          query.changeToModificationUrl('test', 'AE')
+
+          // then
+          function onUpdate(props, prevProps) {
+            const { location, query } = props
+            const { pathname, search } = location
+            const context = query.context('test', 'AE')
+
+            const expectedContext = {
+              isModifiedEntity: true,
+              isCreatedEntity: false,
+              key: 'test',
+              method: 'PATCH',
+              originLocationString: '/foo',
+              readOnly: false
+            }
+            expect(prevProps.location.pathname).toEqual('/foo')
+            expect(prevProps.location.search).toEqual('')
+            expect(pathname).toEqual('/foo')
+            expect(search).toEqual('?testAE=modification')
+            expect(context).toEqual(expectedContext)
+
+            done()
+          }
+        })
+
+        it('withQueryRouter gives query.changeToReadOnlyUrl and query.context for reading only an entity given info in the search', done => {
+          // given
+          const history = createBrowserHistory()
+          history.push('/foo')
+          const wrapper = mount(
+            <Router history={history}>
+              <Route path="/foo">
+                <QueryRouterTest onUpdate={onUpdate} />
+              </Route>
+            </Router>
+          )
+          const { query } = wrapper.find('Test').props()
+
+          // when
+          query.changeToReadOnlyUrl('test')
+
+          // then
+          function onUpdate(props, prevProps) {
+            const { location, query } = props
+            const { pathname, search } = location
+            const context = query.context('test')
+            const expectedContext = {
+              isModifiedEntity: false,
+              isCreatedEntity: false,
+              key: 'test',
+              method: null,
+              readOnly: true
+            }
+            expect(prevProps.location.pathname).toEqual('/foo')
+            expect(prevProps.location.search).toEqual('')
+            expect(pathname).toEqual('/foo')
+            expect(search).toEqual('')
+            expect(context).toEqual(expectedContext)
+
+            done()
+          }
         })
       })
 
@@ -377,8 +490,8 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
           // then
           let expectedContext = {
-            isEditEntity: false,
-            isNewEntity: true,
+            isModifiedEntity: false,
+            isCreatedEntity: true,
             method: 'POST',
             originLocationString: '/beaujolais',
             readOnly: false
@@ -387,7 +500,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
 
           // given
-          history.push('/beaujolais/AE?modifie')
+          history.push('/beaujolais/AE?changement')
           props = wrapper.find('Test').props()
 
           // when
@@ -395,8 +508,8 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
           // then
           expectedContext = {
-            isEditEntity: true,
-            isNewEntity: false,
+            isModifiedEntity: true,
+            isCreatedEntity: false,
             method: 'PATCH',
             originLocationString: '/beaujolais/AE',
             readOnly: false
@@ -412,8 +525,8 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
           // then
           expectedContext = {
-            isEditEntity: false,
-            isNewEntity: false,
+            isModifiedEntity: false,
+            isCreatedEntity: false,
             method: null,
             readOnly: true
           }
@@ -438,8 +551,8 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
           // then
           let expectedContext = {
-            isEditEntity: false,
-            isNewEntity: true,
+            isModifiedEntity: false,
+            isCreatedEntity: true,
             key: 'beaujolais',
             method: 'POST',
             originLocationString: '/foo',
@@ -449,7 +562,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
 
           // given
-          history.push('/foo?beaujolaisAE=modifie')
+          history.push('/foo?beaujolaisAE=changement')
           props = wrapper.find('Test').props()
 
           // when
@@ -457,8 +570,8 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
           // then
           expectedContext = {
-            isEditEntity: true,
-            isNewEntity: false,
+            isCreatedEntity: false,
+            isModifiedEntity: true,
             key: 'beaujolais',
             method: 'PATCH',
             originLocationString: '/foo',
@@ -475,8 +588,8 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
           // then
           expectedContext = {
-            isEditEntity: false,
-            isNewEntity: false,
+            isCreatedEntity: false,
+            isModifiedEntity: false,
             key: 'beaujolais',
             method: null,
             readOnly: true
