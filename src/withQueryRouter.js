@@ -175,7 +175,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       if (!paramValue) {
         paramKey = `${key}${id}`
         paramValue = queryParams[paramKey]
-        if (!paramValue) {
+        if (!id && !paramValue) {
           paramKey = Object.keys(queryParams)
                            .find(queryKey => queryKey.startsWith(key))
           if (paramKey) {
