@@ -60,10 +60,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
     }
 
     change = (notTranslatedQueryParamsUpdater, changeConfig = {}) => {
-
       const { history, location } = this.props
-      const queryParams = this.parse()
-
       const historyMethod = changeConfig.historyMethod || 'push'
       const pathname = changeConfig.pathname || location.pathname
 
@@ -75,6 +72,8 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
           queryParamsUpdater, invertedMapper)
       }
 
+      const queryParams = this.parse()
+
       const queryParamsUpdaterKeys = Object.keys(queryParamsUpdater)
       const concatenatedQueryParamKeys = Object.keys(queryParams)
                                                .concat(queryParamsUpdaterKeys)
@@ -82,20 +81,32 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
 
       const nextQueryParams = {}
       queryParamsKeys.forEach(queryParamsKey => {
+
+        // can be anything
         if (queryParamsUpdater[queryParamsKey]) {
           nextQueryParams[queryParamsKey] = queryParamsUpdater[queryParamsKey]
           return
         }
-        if (
-          queryParamsUpdater[queryParamsKey] !== null &&
-          queryParams[queryParamsKey]
-        ) {
+
+        // can still be undefined null false 0 ''
+        if (typeof queryParamsUpdater[queryParamsKey] === 'undefined') {
           nextQueryParams[queryParamsKey] = queryParams[queryParamsKey]
           return
         }
+
+        // can still be null false 0 ''
+        if (queryParamsUpdater[queryParamsKey] === null) {
+          return
+        }
+
+        // can still be false 0 ''
         if (queryParamsUpdater[queryParamsKey] === '') {
           nextQueryParams[queryParamsKey] = null
+          return
         }
+
+        // can still be false 0
+        nextQueryParams[queryParamsKey] = queryParamsUpdater[queryParamsKey]
       })
 
       const nextLocationSearch = stringify(nextQueryParams)

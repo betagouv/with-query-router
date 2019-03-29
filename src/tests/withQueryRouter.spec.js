@@ -392,7 +392,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
         it('withQueryRouter gives query.changeToModificationUrl and query.context for modifying an entity given info in the search', done => {
           // given
           const history = createBrowserHistory()
-          history.push('/foo')
+          history.push('/foo?bar')
           const wrapper = mount(
             <Router history={history}>
               <Route path="/foo">
@@ -420,9 +420,9 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/foo')
-            expect(prevProps.location.search).toEqual('')
+            expect(prevProps.location.search).toEqual('?bar')
             expect(pathname).toEqual('/foo')
-            expect(search).toEqual('?testAE=modification')
+            expect(search).toEqual('?bar&testAE=modification')
             expect(context).toEqual(expectedContext)
 
             done()
