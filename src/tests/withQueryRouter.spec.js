@@ -263,7 +263,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
               isCreatedEntity: true,
               isModifiedEntity: false,
               method: 'POST',
-              originLocationString: '/tests',
               readOnly: false
             }
             expect(context).toEqual(expectedContext)
@@ -299,7 +298,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
               isModifiedEntity: true,
               isCreatedEntity: false,
               method: 'PATCH',
-              originLocationString: '/tests/AE',
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/tests/AE')
@@ -366,26 +364,25 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToCreationUrl('test')
+          query.changeToCreationUrl({ foo: 'bar' }, { key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {
             const { location, query } = props
             const { pathname, search } = location
-            const context = query.context('test')
+            const context = query.context({ key: 'test' })
 
             const expectedContext = {
               isCreatedEntity: true,
               isModifiedEntity: false,
               key: 'test',
               method: 'POST',
-              originLocationString: '/foo',
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/foo')
             expect(prevProps.location.search).toEqual('')
             expect(pathname).toEqual('/foo')
-            expect(search).toEqual('?test=creation')
+            expect(search).toEqual('?foo=bar&test=creation')
             expect(context).toEqual(expectedContext)
 
             done()
@@ -406,20 +403,19 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToModificationUrl('test', 'AE')
+          query.changeToModificationUrl(null, { id: 'AE', key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {
             const { location, query } = props
             const { pathname, search } = location
-            const context = query.context('test', 'AE')
+            const context = query.context({ id: 'AE', key: 'test' })
 
             const expectedContext = {
               isModifiedEntity: true,
               isCreatedEntity: false,
               key: 'test',
               method: 'PATCH',
-              originLocationString: '/foo',
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/foo')
@@ -446,13 +442,13 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToReadOnlyUrl('test')
+          query.changeToReadOnlyUrl(null, { key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {
             const { location, query } = props
             const { pathname, search } = location
-            const context = query.context('test')
+            const context = query.context({ key: 'test' })
             const expectedContext = {
               isModifiedEntity: false,
               isCreatedEntity: false,
@@ -493,7 +489,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             isModifiedEntity: false,
             isCreatedEntity: true,
             method: 'POST',
-            originLocationString: '/beaujolais',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
@@ -511,7 +506,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             isModifiedEntity: true,
             isCreatedEntity: false,
             method: 'PATCH',
-            originLocationString: '/beaujolais/AE',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
@@ -547,7 +541,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           let props = wrapper.find('Test').props()
 
           // when
-          let context = props.query.context('beaujolais')
+          let context = props.query.context({ key:'beaujolais' })
 
           // then
           let expectedContext = {
@@ -555,7 +549,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             isCreatedEntity: true,
             key: 'beaujolais',
             method: 'POST',
-            originLocationString: '/foo',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
@@ -566,7 +559,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           props = wrapper.find('Test').props()
 
           // when
-          context = props.query.context('beaujolais')
+          context = props.query.context({ key: 'beaujolais' })
 
           // then
           expectedContext = {
@@ -574,7 +567,6 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             isModifiedEntity: true,
             key: 'beaujolais',
             method: 'PATCH',
-            originLocationString: '/foo',
             readOnly: false
           }
           expect(context).toEqual(expectedContext)
@@ -584,7 +576,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           props = wrapper.find('Test').props()
 
           // when
-          context = props.query.context('beaujolais')
+          context = props.query.context({ key: 'beaujolais' })
 
           // then
           expectedContext = {

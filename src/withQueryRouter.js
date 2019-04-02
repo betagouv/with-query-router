@@ -105,9 +105,10 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       history[historyMethod](creationPath)
     }
 
-    context = (key, id) => {
+    context = (config={}) => {
+      const { key, id } = config
       if (key) {
-        return this.contextWithEntityInSearch(key, id)
+        return this.contextWithEntityInSearch(config)
       }
       return this.contextWithEntityInPathname()
     }
@@ -120,12 +121,10 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       const matchedResults = pathname.match(re)
       const matchedKey = matchedResults && matchedResults[0]
       if (matchedKey) {
-        const originLocationString = `${pathname.slice(0, -matchedKey.length - 1)}${search}`
         return {
           isModifiedEntity: false,
           isCreatedEntity: true,
           method: 'POST',
-          originLocationString,
           readOnly: false,
         }
       }
@@ -136,12 +135,10 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         const nextSearchString = Object.keys(nextSearch).length
           ? `?${stringify(nextSearch)}`
           : ''
-        const originLocationString = `${pathname}${nextSearchString}`
         return {
           isModifiedEntity: true,
           isCreatedEntity: false,
           method: 'PATCH',
-          originLocationString,
           readOnly: false,
         }
       }
@@ -154,7 +151,8 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       }
     }
 
-    contextWithEntityInSearch = (key, id) => {
+    contextWithEntityInSearch = (config={}) => {
+      const { id, key } = config
       const { location: { pathname } } = this.props
       const queryParams = this.parse()
       let paramKey = key
@@ -165,16 +163,12 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         const nextSearch = Object.assign({}, queryParams)
         delete nextSearch[paramKey]
         const nextSearchString = stringify(nextSearch)
-        const originLocationString = Object.keys(nextSearch).length
-          ? `${pathname}?${nextSearchString}`
-          : pathname
 
         return {
           isModifiedEntity: false,
           isCreatedEntity: true,
           key,
           method: 'POST',
-          originLocationString,
           readOnly: false,
         }
       }
@@ -194,16 +188,12 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         const nextSearch = Object.assign({}, queryParams)
         delete nextSearch[paramKey]
         const nextSearchString = stringify(nextSearch)
-        const originLocationString = Object.keys(nextSearch).length
-          ? `${pathname}?${nextSearchString}`
-          : pathname
 
         return {
           isCreatedEntity: false,
           isModifiedEntity: true,
           key,
           method: 'PATCH',
-          originLocationString,
           readOnly: false,
         }
       }
@@ -217,27 +207,35 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       }
     }
 
-    changeToCreationUrl = key => {
+    changeToCreationUrl = (queryParamsUpdater, contextConfig={}) => {
+      const { key } = contextConfig
       const { history, location } = this.props
       const { pathname, search } = location
-      let creationUrl
+
+      const creationChange = Object.assign({}, queryParamsUpdater)
       if (!key) {
-        creationUrl = `${pathname}/${creationKey}${search}`
-        history.push(creationUrl)
+        const creationPathname = `${pathname}/${creationKey}`
+        this.change(creationChange, { pathname: creationPathname })
         return
       }
 
-      this.change({ [key]: creationKey })
+      creationChange[key] = creationKey
+
+      this.change(creationChange)
     }
 
-    changeToModificationUrl = (key, id) => {
+    changeToModificationUrl = (queryParamsUpdater, contextConfig={}) => {
+      const { id, key } = contextConfig
+
+      const modificationChange = Object.assign({}, queryParamsUpdater)
+
       if (!key) {
-        this.change({ [modificationKey]: '' })
+        modificationChange[modificationKey] = ''
+        this.change(modificationChange)
         return
       }
 
       const queryParams = this.parse()
-      const modificationChange = {}
       Object.keys(queryParams).forEach(queryKey => {
         if (queryKey.startsWith(key)) {
           modificationChange[queryKey] = null
@@ -245,36 +243,39 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       })
       const nextQueryKey = `${key}${id}`
       modificationChange[nextQueryKey] = modificationKey
+
       this.change(modificationChange)
     }
 
-    changeToReadOnlyUrl = (key, id) => {
+    changeToReadOnlyUrl = (queryParamsUpdater, contextConfig={}) => {
+      const { id, key } = contextConfig
       const { location } = this.props
-      const { pathname, search } = location
+      const { pathname } = location
       const queryParams = this.parse()
 
+      const readOnlyChange = Object.assign({}, queryParamsUpdater)
       if (!key) {
 
-        let readOnlyUrl
         if (pathname.endsWith(creationKey)) {
-          readOnlyUrl = `${pathname.slice(0, -creationKey.length - 1)}${id}${search}`
-          history.push(readOnlyUrl)
+          const readOnlyPathname = `${pathname.slice(0, -creationKey.length - 1)}${id}`
+          this.change(readOnlyChange, { pathname: readOnlyPathname })
           return
         }
 
         if (typeof queryParams[modificationKey] !== 'undefined') {
-          this.change({ [modificationKey]: null })
+          readOnlyChange[modificationKey] = null
+          this.change(readOnlyChange)
           return
         }
       }
 
-      const modificationChange = {}
       Object.keys(queryParams).forEach(queryKey => {
         if (queryKey.startsWith(key)) {
-          modificationChange[queryKey] = null
+          readOnlyChange[queryKey] = null
         }
       })
-      this.change(modificationChange)
+
+      this.change(readOnlyChange)
     }
 
     parse = () => {
