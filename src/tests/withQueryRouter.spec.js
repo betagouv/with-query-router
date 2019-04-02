@@ -235,7 +235,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
     describe('context', () => {
       describe('pathname context', () => {
-        it('withQueryRouter gives query.changeToCreationUrl and query.context for creating an entity given info in the pathname', done => {
+        it('withQueryRouter gives query.changeToCreation and query.context for creating an entity given info in the pathname', done => {
           // given
           const history = createBrowserHistory()
           history.push('/tests')
@@ -249,7 +249,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { location, query } = wrapper.find('Test').props()
 
           // when
-          query.changeToCreationUrl()
+          query.changeToCreation()
 
           // then
           function onUpdate(props, prevProps) {
@@ -272,7 +272,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
 
         })
 
-        it('withQueryRouter gives query.changeToModificationUrl and query.context for modifying an entity given info in the pathname', done => {
+        it('withQueryRouter gives query.changeToModification and query.context for modifying an entity given info in the pathname', done => {
           // given
           const history = createBrowserHistory()
           history.push('/tests/AE')
@@ -286,7 +286,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToModificationUrl()
+          query.changeToModification()
 
           // then
           function onUpdate(props, prevProps) {
@@ -310,7 +310,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           }
         })
 
-        it('withQueryRouter gives query.changeToReadOnlyUrl and query.context for reading only a created entity given info in the pathname', done => {
+        it('withQueryRouter gives query.changeToReadOnly and query.context for reading only a created entity given info in the pathname', done => {
           // given
           const history = createBrowserHistory()
           history.push('/tests/creation')
@@ -324,7 +324,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToReadOnlyUrl({ foo: 'bar' }, { id: 'AE'})
+          query.changeToReadOnly({ foo: 'bar' }, { id: 'AE'})
 
           // then
           function onUpdate(props, prevProps) {
@@ -348,7 +348,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           }
         })
 
-        it('withQueryRouter gives query.changeToReadOnlyUrl and query.context for reading only a modified entity given info in the pathname', done => {
+        it('withQueryRouter gives query.changeToReadOnly and query.context for reading only a modified entity given info in the pathname', done => {
           // given
           const history = createBrowserHistory()
           history.push('/tests/AE?modification')
@@ -362,7 +362,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToReadOnlyUrl()
+          query.changeToReadOnly()
 
           // then
           function onUpdate(props, prevProps) {
@@ -388,10 +388,10 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
       })
 
       describe('search context', () => {
-        it('withQueryRouter gives query.changeToCreationUrl and query.context for creating an entity given info in the search', done => {
+        it('withQueryRouter gives query.changeToCreation and query.context for creating an entity given info in the search', done => {
           // given
           const history = createBrowserHistory()
-          history.push('/foo')
+          history.push('/foo?fee')
           const wrapper = mount(
             <Router history={history}>
               <Route path="/foo">
@@ -402,7 +402,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToCreationUrl({ foo: 'bar' }, { key: 'test' })
+          query.changeToCreation({ foo: 'bar' }, { key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {
@@ -418,16 +418,16 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
               readOnly: false
             }
             expect(prevProps.location.pathname).toEqual('/foo')
-            expect(prevProps.location.search).toEqual('')
+            expect(prevProps.location.search).toEqual('?fee')
             expect(pathname).toEqual('/foo')
-            expect(search).toEqual('?foo=bar&test=creation')
+            expect(search).toEqual('?fee&foo=bar&test=creation')
             expect(context).toEqual(expectedContext)
 
             done()
           }
         })
 
-        it('withQueryRouter gives query.changeToModificationUrl and query.context for modifying an entity given info in the search', done => {
+        it('withQueryRouter gives query.changeToModification and query.context for modifying an entity given info in the search', done => {
           // given
           const history = createBrowserHistory()
           history.push('/foo')
@@ -441,7 +441,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToModificationUrl(null, { id: 'AE', key: 'test' })
+          query.changeToModification(null, { id: 'AE', key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {
@@ -466,7 +466,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           }
         })
 
-        it('withQueryRouter gives query.changeToReadOnlyUrl and query.context for reading only an entity given info in the search', done => {
+        it('withQueryRouter gives query.changeToReadOnly and query.context for reading only an entity given info in the search', done => {
           // given
           const history = createBrowserHistory()
           history.push('/foo')
@@ -480,7 +480,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToReadOnlyUrl(null, { key: 'test' })
+          query.changeToReadOnly(null, { key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {

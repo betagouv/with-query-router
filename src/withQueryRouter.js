@@ -26,9 +26,9 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         change: this.change,
         clear: this.clear,
         context: this.context,
-        changeToCreationUrl: this.changeToCreationUrl,
-        changeToModificationUrl: this.changeToModificationUrl,
-        changeToReadOnlyUrl: this.changeToReadOnlyUrl,
+        changeToCreation: this.changeToCreation,
+        changeToModification: this.changeToModification,
+        changeToReadOnly: this.changeToReadOnly,
         parse: this.parse,
         remove: this.remove,
         translate: this.translate
@@ -88,7 +88,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
         }
         if (
           queryParamsUpdater[queryParamsKey] !== null &&
-          queryParams[queryParamsKey]
+          typeof queryParams[queryParamsKey] !== 'undefined'
         ) {
           nextQueryParams[queryParamsKey] = queryParams[queryParamsKey]
           return
@@ -100,9 +100,9 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
 
       const nextLocationSearch = stringify(nextQueryParams)
 
-      const creationPath = `${pathname}?${nextLocationSearch}`
+      const changedPath = `${pathname}?${nextLocationSearch}`
 
-      history[historyMethod](creationPath)
+      history[historyMethod](changedPath)
     }
 
     context = (config={}) => {
@@ -207,7 +207,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       }
     }
 
-    changeToCreationUrl = (queryParamsUpdater, contextConfig={}) => {
+    changeToCreation = (queryParamsUpdater, contextConfig={}) => {
       const { key } = contextConfig
       const { history, location } = this.props
       const { pathname, search } = location
@@ -224,7 +224,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       this.change(creationChange)
     }
 
-    changeToModificationUrl = (queryParamsUpdater, contextConfig={}) => {
+    changeToModification = (queryParamsUpdater, contextConfig={}) => {
       const { id, key } = contextConfig
 
       const modificationChange = Object.assign({}, queryParamsUpdater)
@@ -247,7 +247,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       this.change(modificationChange)
     }
 
-    changeToReadOnlyUrl = (queryParamsUpdater, contextConfig={}) => {
+    changeToReadOnly = (queryParamsUpdater, contextConfig={}) => {
       const { id, key } = contextConfig
       const { location } = this.props
       const { pathname } = location
@@ -274,7 +274,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
           return
         }
 
-        console.warn('tried to changeToReadOnlyUrl but did not find a pathname context')
+        console.warn('tried to changeToReadOnly but did not find a pathname context')
         return
       }
 
