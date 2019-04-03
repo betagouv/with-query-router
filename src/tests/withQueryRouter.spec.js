@@ -1,6 +1,7 @@
 import { mount, shallow } from 'enzyme'
 import { createBrowserHistory } from 'history'
-import React from 'react'
+import React, { Fragment
+} from 'react'
 import { Route, Router } from 'react-router-dom'
 
 import { FrenchQueryRouterTest, QueryRouterTest } from './utils'
@@ -395,72 +396,100 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const wrapper = mount(
             <Router history={history}>
               <Route path="/foo">
-                <QueryRouterTest onUpdate={onUpdate} />
+                <Fragment>
+                  <QueryRouterTest onUpdate={onUpdate} />
+                  <QueryRouterTest id='AE' onUpdate={onUpdate} />
+                </Fragment>
               </Route>
             </Router>
           )
-          const { query } = wrapper.find('Test').props()
+          const { query } = wrapper.find('Test').first().props()
 
           // when
           query.changeToCreation({ foo: 'bar' }, { key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {
-            const { location, query } = props
+            const { id, location, query } = props
             const { pathname, search } = location
-            const context = query.context({ key: 'test' })
+            const context = query.context({ id, key: 'test' })
 
-            const expectedContext = {
-              isCreatedEntity: true,
-              isModifiedEntity: false,
-              key: 'test',
-              method: 'POST',
-              readOnly: false
+            if (!id) {
+              const expectedContext = {
+                isCreatedEntity: true,
+                isModifiedEntity: false,
+                key: 'test',
+                method: 'POST',
+                readOnly: false
+              }
+              expect(prevProps.location.pathname).toEqual('/foo')
+              expect(prevProps.location.search).toEqual('?fee')
+              expect(pathname).toEqual('/foo')
+              expect(search).toEqual('?fee&foo=bar&test=creation')
+              expect(context).toEqual(expectedContext)
+            } else if (id === 'AE') {
+              const expectedContext = {
+                isCreatedEntity: false,
+                isModifiedEntity: false,
+                key: 'test',
+                method: null,
+                readOnly: true
+              }
+              expect(context).toEqual(expectedContext)
             }
-            expect(prevProps.location.pathname).toEqual('/foo')
-            expect(prevProps.location.search).toEqual('?fee')
-            expect(pathname).toEqual('/foo')
-            expect(search).toEqual('?fee&foo=bar&test=creation')
-            expect(context).toEqual(expectedContext)
 
             done()
           }
         })
 
-        it('withQueryRouter gives query.changeToModification and query.context for modifying an entity given info in the search', done => {
+        it.only('withQueryRouter gives query.changeToModification and query.context for modifying an entity given info in the search', done => {
           // given
           const history = createBrowserHistory()
           history.push('/foo')
           const wrapper = mount(
             <Router history={history}>
               <Route path="/foo">
-                <QueryRouterTest onUpdate={onUpdate} />
+                <Fragment>
+                  <QueryRouterTest id='AE' onUpdate={onUpdate} />
+                  <QueryRouterTest id='BF' onUpdate={onUpdate} />
+                </Fragment>
               </Route>
             </Router>
           )
-          const { query } = wrapper.find('Test').props()
+          const { query } = wrapper.find('Test').find({ id: 'AE' }).props()
 
           // when
           query.changeToModification(null, { id: 'AE', key: 'test' })
 
           // then
           function onUpdate(props, prevProps) {
-            const { location, query } = props
+            const { id, location, query } = props
             const { pathname, search } = location
-            const context = query.context({ id: 'AE', key: 'test' })
+            const context = query.context({ id, key: 'test' })
 
-            const expectedContext = {
-              isModifiedEntity: true,
-              isCreatedEntity: false,
-              key: 'test',
-              method: 'PATCH',
-              readOnly: false
+            if (id === 'AE') {
+              const expectedContext = {
+                isModifiedEntity: true,
+                isCreatedEntity: false,
+                key: 'test',
+                method: 'PATCH',
+                readOnly: false
+              }
+              expect(prevProps.location.pathname).toEqual('/foo')
+              expect(prevProps.location.search).toEqual('')
+              expect(pathname).toEqual('/foo')
+              expect(search).toEqual('?testAE=modification')
+              expect(context).toEqual(expectedContext)
+            } else if (id === 'BF') {
+              const expectedContext = {
+                isModifiedEntity: false,
+                isCreatedEntity: false,
+                key: 'test',
+                method: null,
+                readOnly: true
+              }
+              expect(context).toEqual(expectedContext)
             }
-            expect(prevProps.location.pathname).toEqual('/foo')
-            expect(prevProps.location.search).toEqual('')
-            expect(pathname).toEqual('/foo')
-            expect(search).toEqual('?testAE=modification')
-            expect(context).toEqual(expectedContext)
 
             done()
           }

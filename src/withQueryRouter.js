@@ -158,8 +158,11 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       let paramKey = key
       let paramValue = queryParams[paramKey]
 
-      if (!id && (paramValue === creationKey || (creationKey.test && creationKey.test(paramValue)))) {
-
+      const isCreationSearch = (
+        paramValue === creationKey ||
+        (creationKey.test && creationKey.test(paramValue))
+      )
+      if (!id && isCreationSearch) {
         const nextSearch = Object.assign({}, queryParams)
         delete nextSearch[paramKey]
         const nextSearchString = stringify(nextSearch)
@@ -176,13 +179,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       if (!paramValue) {
         paramKey = `${key}${id}`
         paramValue = queryParams[paramKey]
-        if (!paramValue) {
-          paramKey = Object.keys(queryParams)
-                           .find(queryKey => queryKey.startsWith(key))
-          paramValue = queryParams[paramKey]
-        }
       }
-
       if (paramValue === modificationKey) {
 
         const nextSearch = Object.assign({}, queryParams)
