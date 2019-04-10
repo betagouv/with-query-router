@@ -254,13 +254,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       if (!key) {
 
         if (pathname.endsWith(creationKey)) {
-
-          if (!id) {
-            console.warn('You need to specify the created id in the context config')
-            return
-          }
-
-          const readOnlyPathname = `${pathname.slice(0, -creationKey.length - 1)}/${id}`
+          const readOnlyPathname = pathname.slice(0, -creationKey.length - 1)
           this.change(readOnlyChange, { pathname: readOnlyPathname })
           return
         }
