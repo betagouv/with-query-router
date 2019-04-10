@@ -325,7 +325,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           const { query } = wrapper.find('Test').props()
 
           // when
-          query.changeToReadOnly({ foo: 'bar' }, { id: 'AE'})
+          query.changeToReadOnly({ foo: 'bar' })
 
           // then
           function onUpdate(props, prevProps) {
@@ -341,7 +341,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
             }
             expect(prevProps.location.pathname).toEqual('/tests/creation')
             expect(prevProps.location.search).toEqual('')
-            expect(pathname).toEqual('/tests/AE')
+            expect(pathname).toEqual('/tests')
             expect(search).toEqual('?foo=bar')
             expect(context).toEqual(expectedContext)
 
@@ -442,7 +442,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           }
         })
 
-        it.only('withQueryRouter gives query.changeToModification and query.context for modifying an entity given info in the search', done => {
+        it('withQueryRouter gives query.changeToModification and query.context for modifying an entity given info in the search', done => {
           // given
           const history = createBrowserHistory()
           history.push('/foo')
@@ -626,7 +626,7 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           props = wrapper.find('Test').props()
 
           // when
-          context = props.query.context({ key: 'beaujolais' })
+          context = props.query.context({ key: 'beaujolais', id: 'AE' })
 
           // then
           expectedContext = {
