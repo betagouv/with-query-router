@@ -254,7 +254,11 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       if (!key) {
 
         if (pathname.endsWith(creationKey)) {
-          const readOnlyPathname = pathname.slice(0, -creationKey.length - 1)
+          let readOnlyPathname = pathname.slice(0, -creationKey.length - 1)
+          if (id) {
+            readOnlyPathname = `${readOnlyPathname}/${id}`
+          }
+
           this.change(readOnlyChange, { pathname: readOnlyPathname })
           return
         }
