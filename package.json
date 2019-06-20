@@ -56,7 +56,7 @@
     "hoc",
     "query"
   ],
-  "license": "MIT",
+  "license": "Mozilla Public License",
   "main": "lib/index.js",
   "name": "with-query-router",
   "private": false,

@@ -488,7 +488,47 @@ describe('src | components | pages | hocs | withQueryRouter', () => {
           }
         })
 
-        it('withQueryRouter gives query.changeToReadOnly and query.context for read only an entity given info in the pathname', done => {
+        it('withQueryRouter gives query.changeToReadOnly and query.context for read only from a created entity given info in the pathname', done => {
+          // given
+          const history = createBrowserHistory()
+          history.push('/tests/creation')
+          const wrapper = mount(
+            <Router history={history}>
+              <Route path="/tests/:id?">
+                <Fragment>
+                  <QueryRouterTest onUpdate={onUpdate} />
+                  <QueryRouterTest id="BF" onUpdate={onUpdate} />
+                </Fragment>
+              </Route>
+            </Router>
+          )
+          const { location, query } = wrapper.find('Test').first().props()
+
+          // when
+          query.changeToReadOnly(null)
+
+          // then
+          function onUpdate(props, prevProps) {
+            const { id, location, query } = props
+            const { pathname, search } = location
+            const context = query.context({ id })
+
+            expect(prevProps.location.pathname).toEqual('/tests/creation')
+            expect(pathname).toEqual('/tests')
+
+            const expectedContext = {
+              isCreatedEntity: false,
+              isModifiedEntity: false,
+              method: null,
+              readOnly: true
+            }
+            expect(context).toEqual(expectedContext)
+
+            done()
+          }
+        })
+
+        it('withQueryRouter gives query.changeToReadOnly and query.context for read only from a modified entity given info in the pathname', done => {
           // given
           const history = createBrowserHistory()
           history.push('/tests/AE?modification')
