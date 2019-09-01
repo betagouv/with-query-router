@@ -2,7 +2,6 @@
 src/
 .eslintrc.json
 .prettierrc.json
-icon.png
 jest-transformer.js
 jest.config.js
 jest.setup.js
