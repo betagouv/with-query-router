@@ -24,11 +24,11 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       this.query = {
         add: this.add,
         change: this.change,
-        clear: this.clear,
-        context: this.context,
         changeToCreation: this.changeToCreation,
         changeToModification: this.changeToModification,
         changeToReadOnly: this.changeToReadOnly,
+        clear: this.clear,
+        context: this.context,
         parse: this.parse,
         remove: this.remove,
         translate: this.translate
@@ -101,11 +101,13 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       const nextLocationSearch = stringify(nextQueryParams)
       const changedPath = `${pathname}?${nextLocationSearch}`
 
+      console.log('changedPath', changedPath)
+
       history[historyMethod](changedPath)
     }
 
     context = (config={}) => {
-      const { key, id } = config
+      const { key } = config
       if (key) {
         return this.contextWithEntityInSearch(config)
       }
@@ -113,8 +115,7 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
     }
 
     contextWithEntityInPathname = (config={}) => {
-      const { id } = config
-      const { location: { pathname, search } } = this.props
+      const { location: { pathname } } = this.props
       const queryParams = this.parse()
 
       const re = new RegExp(`(${creationKey})$`)
@@ -136,22 +137,22 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       if (id) {
         if (id === creationKey) {
           return {
-            isModifiedEntity: false,
             isCreatedEntity: true,
+            isModifiedEntity: false,
             method: 'POST',
             readOnly: false,
           }
-        } else {
-          return {
-            isModifiedEntity: false,
-            isCreatedEntity: false,
-            readOnly: true,
-          }
+        }
+        return {
+          isCreatedEntity: false,
+          isModifiedEntity: false,
+          readOnly: true,
         }
       }
       return {
-        isModifiedEntity: false,
         isCreatedEntity: true,
+        isModifiedEntity: false,
+
         method: 'POST',
         readOnly: false,
       }
@@ -163,22 +164,22 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
       if (id) {
         if (pathname.endsWith(id)) {
           return {
-            isModifiedEntity: true,
             isCreatedEntity: false,
+            isModifiedEntity: true,
             method: 'PATCH',
             readOnly: false,
           }
         }
         return {
-          isModifiedEntity: false,
           isCreatedEntity: false,
+          isModifiedEntity: false,
           readOnly: true,
         }
       }
 
       return {
-        isModifiedEntity: true,
         isCreatedEntity: false,
+        isModifiedEntity: true,
         method: 'PATCH',
         readOnly: false,
       }
@@ -186,8 +187,8 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
 
     readOnlyContextWithEntityInPathname = () => {
       return {
-        isModifiedEntity: false,
         isCreatedEntity: false,
+        isModifiedEntity: false,
         method: null,
         readOnly: true,
       }
@@ -195,7 +196,6 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
 
     contextWithEntityInSearch = (config={}) => {
       const { id, key } = config
-      const { location: { pathname } } = this.props
       const queryParams = this.parse()
       let paramKey = key
       let paramValue = queryParams[paramKey]
@@ -222,8 +222,8 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
     creationContextWithEntityInSearch = (config={}) => {
       const { key } = config
       return {
-        isModifiedEntity: false,
         isCreatedEntity: true,
+        isModifiedEntity: false,
         key,
         method: 'POST',
         readOnly: false,
@@ -253,9 +253,9 @@ export const withQueryRouter = (config={}) => WrappedComponent => {
     }
 
     changeToCreation = (queryParamsUpdater, contextConfig={}) => {
-      const { id, key } = contextConfig
-      const { history, location } = this.props
-      const { pathname, search } = location
+      const { key } = contextConfig
+      const { location } = this.props
+      const { pathname } = location
 
       const creationChange = Object.assign({}, queryParamsUpdater)
       if (!key) {
