@@ -1,6 +1,6 @@
 {
   "name": "with-query-router",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "private": false,
   "main": "lib/index.js",
   "license": "MPL-2.0",
