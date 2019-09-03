@@ -7,7 +7,6 @@
   "description": "A small wrapper of react-router parsing the query params from the location.search",
   "dependencies": {
     "classnames": "2.2.5",
-    "eslint": "^5.8.0",
     "lodash.invert": "^4.3.0",
     "lodash.uniq": "^4.5.0",
     "prop-types": "^15.6.2",
@@ -62,6 +61,7 @@
   },
   "scripts": {
     "compile": "rm -rf lib && babel --plugins transform-class-properties,transform-object-rest-spread --presets env,react -d lib/ src/",
+    "format:js": "prettier-eslint --write './**/*.{js,jsx}'",
     "postinstall": "if [ -d \"src/\" ]; then npm run compile; fi",
     "precommit": "./precommit.sh",
     "prettier": "$(yarn bin)/prettier --write 'src/**/*.js'",
